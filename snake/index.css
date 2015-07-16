@@ -1,0 +1,41 @@
+body {
+	background-color: #bbb;
+}
+
+#content {
+	width: 100%;
+}
+
+#cvs {
+	adding: 0;
+    margin: auto;
+    display: block;
+    width: 400px;
+}
+
+table {
+	text-align: center;
+    margin: auto;
+    display: block;
+	width: 200px;
+}
+table tr td:first-child {
+	min-width: 100px;
+	text-align: right;
+	padding-right: 5px;
+}
+
+table tr td:last-child {
+	min-width: 100px;
+	text-align: left;
+	padding-left: 5px;
+}
+
+footer{
+	font-size: 12px;
+	position: absolute;
+	bottom: 10px;
+	width: 100%;
+	text-align: center;
+	
+}
