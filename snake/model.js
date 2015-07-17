@@ -1,9 +1,11 @@
 var canvas = document.getElementById('cvs'),
+	bgCanvas = document.getElementById('bgCanvas'),
 	width = canvas.clientWidth,
 	height = canvas.clientHeight,
 	boardWidth = 38, // represents the number of horizontal gameboard boxes
 	squareSize = width / boardWidth,
-	boardHeight = height / squareSize;
+	boardHeight = height / squareSize,
+	gameOver = true;
 	
 var snakeObj = {
 	init: function(){
@@ -21,15 +23,16 @@ var snakeObj = {
 var gameObj = function(){
 	var speed = 120,
 		gameObj = {
-		init: function(){
+		init: function(obstacles){
 			this.running = false;
 			this.speed = speed;
+			this.obstacles = obstacles;
 			return this;
 		},
 		increaseSpeed: function(){
-			if(speed >= 5){
-				speed -= 5;
-				this.speed = speed;
+			if(this.speed >= 65){
+				//speed -= 5;
+				this.speed -= 5;
 				console.log('speed increased: ' + this.speed);
 			}
 		},
@@ -45,15 +48,15 @@ var gameObj = function(){
 
 var foodObj = function(){
 	var food = {
-		init: function(){
-			this.x = Math.round(Math.random() * (boardWidth - 4)) + 2;
-			this.y = Math.round(Math.random() * (boardHeight - 4)) + 2;
+		init: function(coord){
+			this.x = coord.x;
+			this.y = coord.y;
 			return this;
 		}
 	}
 	return food;
 }();
 
-var food = Object.create(foodObj).init();
-var game = Object.create(gameObj).init();
-var snake = Object.create(snakeObj).init();
+// var food = Object.create(foodObj).init({x:2, y:2});
+// var game = Object.create(gameObj).init(generateObstacles(5));
+// var snake = Object.create(snakeObj).init();

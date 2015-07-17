@@ -1,17 +1,28 @@
+body, table, div, canvas, footer {
+	margin: 0;
+	padding: 0;
+}
 body {
 	background-color: #bbb;
+}
+
+.wrapper {
+    position: relative;
+	margin: auto;
+    width: 400px;
+    height: 304px;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 #content {
 	width: 100%;
 }
 
-#cvs {
-	adding: 0;
-    margin: auto;
-    display: block;
-    width: 400px;
-}
 
 table {
 	text-align: center;

@@ -1,3 +1,6 @@
+var food,
+	snake,
+	game;
 function updateSnake(snakeObj){
 	var last = {},
 		temp = {};
@@ -48,7 +51,14 @@ document.onkeypress = function(e) {
 	        snake.direction = newDir;
     }
 	if (charCode == 32) { //space
-        togglePause(game);
+		if(gameOver){
+			gameOver = false;
+			newGame();
+			
+		} else {
+			togglePause(game);	
+		}
+        
     }
 };
 
@@ -63,18 +73,29 @@ function togglePause(gameObj){
 	if (gameObj.running){
 		gameObj.running = false;
 	}
-	else
+	else {
 		gameObj.running = true;
+		setTimeout(animate, game.speed);
+	}
 }
 
 
 function snakeCheck(snakeObj) {
 	var arr = snakeObj.members,
+		obst = game.obstacles,
+		obstLen = obst.length,
 		len = arr.length;
 	if(arr[0].x <= 1 || arr[0].x >= boardWidth - 1 || arr[0].y <= 1 || arr[0].y >= boardHeight - 1) {
 		return 'hit-wall';
 	}
 	for (var i = 0; i < len; i++) {
+		if(i === 0){
+			for (var k = 0; k < obstLen; k++) {
+				if(arr[0].x === obst[k].x && arr[0].y === obst[k].y){
+					return 'hit-wall';
+				}		
+			}
+		}
 		for (var j = i + 1; j < len; j++){
 			if(arr[i].x === arr[j].x && arr[i].y === arr[j].y){
 				return 'self-eat';
@@ -88,7 +109,7 @@ function snakeCheck(snakeObj) {
 }
 
 function eatFood(snakeObj){
-	food = Object.create(foodObj).init();
+	food = Object.create(foodObj).init(foodCoord());
 	snakeObj.score++;
 	snakeObj.length ++;
 	snakeObj.members.push({
@@ -110,6 +131,7 @@ function checkEnding(snakeObj) {
 
 function endGame(reason, score) {
 	var highScore = 'unsupported';
+	console.log(reason);
 	if(typeof(Storage) !== "undefined") {
     	if(!localStorage.getItem('highScore') || score > localStorage.getItem('highScore')){
 			localStorage.setItem('highScore', score);					
@@ -119,26 +141,83 @@ function endGame(reason, score) {
 	    // Sorry! No Web Storage support..
 	}
 	drawGameOver(score, highScore);
-	newGame();
+	gameOver = true;
+}
+
+function generateObstacles(num){
+	var obstacles = [],
+		x,
+		y;
+		for(var i = 0; i < num; i++){
+			x = Math.round(Math.random() * (boardWidth - 8)) + 4;
+			y = Math.round(Math.random() * (boardHeight - 8)) + 4;
+			obstacles.push({
+				x: x,
+				y: y
+			});
+			obstacles.push({
+				x: x + 1,
+				y: y
+			});
+			obstacles.push({
+				x: x + 1,
+				y: y + 1
+			});
+			obstacles.push({
+				x: x,
+				y: y + 1
+			});
+		}
+	return obstacles;
+}
+
+function foodCoord(){
+	var x = Math.round(Math.random() * (boardWidth - 4)) + 2,
+		y = Math.round(Math.random() * (boardHeight - 4)) + 2,
+		unique = true;
+		
+		game.obstacles.forEach(function(obst){
+			if(obst.x == x && obst.y == y){
+				unique = false;
+			}
+		});
+		snake.members.forEach(function(el){
+			if(el.x == x && el.y == y){
+				unique = false;
+			}
+		});
+		if(unique){
+			return {x: x, y: y};
+		} else {
+			console.log('wrong food placement prevented');
+			return foodCoord();
+		}
 }
 
 function newGame(){
-	food = Object.create(foodObj).init();
-	game = Object.create(gameObj).init();
+	game = Object.create(gameObj).init(generateObstacles(5));
 	snake = Object.create(snakeObj).init();
+	food = Object.create(foodObj).init(foodCoord());
+	clearCanvas(bgCtx);
+	clearGameBoard();
+	drawSnake(snake);
+	drawFood(food);
+	drawBoard();
+	drawObstacles();
 }
 
-setInterval(function() {
-	if (game.running){
-        updateSnake(snake);
-		drawBoard();
-		drawFood(food);
-		drawSnake(snake);
-		drawScore(snake);
-		checkEnding(snake);
+function animate(){
+	if (game.running && !gameOver){
+        setTimeout(animate, game.speed);
 	}
-        
-      }, game.speed);
+    updateSnake(snake);		
+	drawFrame(food, snake);
+	checkEnding(snake);
+}
+
+//setTimeout(animate, game.speed);
+
+
 // console.log(snake.members);
 // updateSnake(snake);
 // console.log(snake.members);
